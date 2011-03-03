@@ -11,7 +11,14 @@ public class Proj1RushHour {
     JButton animateButton;
     JComboBox boardCombo;
 
-    public void initBoardCombo() {
+    public String[] initBoardCombo() {
+        String[] ret = new String[1 + GameState.initialGameStateCount()];
+        ret[0] = "Select a board...";
+        for (int i = 1; i <= GameState.initialGameStateCount(); i++) {
+            ret[i] = Integer.toString(i);
+        }
+
+        return ret;
     }
 
     public Proj1RushHour() {
@@ -27,8 +34,8 @@ public class Proj1RushHour {
 
         JPanel select = new JPanel();
         select.setLayout(new BorderLayout());
-        String[] cb = {"Select a board"};
-        boardCombo = new JComboBox(cb);
+        String[] comboVals = initBoardCombo();
+        boardCombo = new JComboBox(comboVals);
         select.add(boardCombo, BorderLayout.NORTH);
         select.add(Box.createVerticalStrut(10), BorderLayout.CENTER);
         select.add(new JButton(new AbstractAction("Solve!") {

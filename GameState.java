@@ -1,54 +1,21 @@
 
 public class GameState
 {
-    private int boardSize; // Either 6 or 7, corresponding to standard RushHour game or extended RushHour game
-    private char[][] board; // Playing piece positions on a board
-
-    /**
-     * Constructor for objects of class GameState
-     * @param boardSize Either 6 or 7, corresponding to standard RushHour game or
-     *   extended RushHour game
-     */
-    public GameState(int bs)
-    {
-        boardSize = bs;  
-    }
-
-    /**
-     * Show the state of the game pieces.
-     * 
-     */
-    public void showGameState()
-    {
-        System.out.println("Showing game state " );
-
-        for (int i = 0; i < boardSize; i++)
-        {
-            for (int j = 0; j < boardSize; j++)
-            {
-                System.out.print(board[i][j]);
-            }
-            System.out.println();
-        }
-
-    }
-             
     /**
      * Game piece positions for the given RushHour game.
      * 
      * @param  g   the given RushHour game.
      */
-    public void initializeGame(int g)
+    public char[][] getInitialGame(int g)
     {
-
-        if (g > 0 && g <= initialGameStates())  // Known range of valid initial game states
-        {
-            board = (char [][]) tempboard[g-1];  // Return correct initial game state
+        
+        // Known range of valid initial game states {
+        if (g > 0 && g <= initialGameStateCount())  {
+            return (char [][]) tempboard[g-1];  // Return initial game state
         }
 		else
 		{
-			System.out.println("  Bad initial game of " + g + " in GameState.initializeGame()" );
-			System.exit(0);
+			throw new IllegalArgumentException("Game number out of range");
 		}
 
     } // end initializeGame
@@ -57,18 +24,14 @@ public class GameState
     /**
      * Return the number of possible initial states of RushHour game.
      */
-    public int initialGameStates()
+    public static int initialGameStateCount()
     {
         return tempboard.length;
     } // end initialGameStates
 
-	
-	
-	
-	
     // This declaration is put at the bottom because it's so big and would 
     // obscure the methods
-    private char tempboard[][][] = {
+    final static private char tempboard[][][] = {
              
 			// RushHour Railroad card 0, Blank, 0 move solution
             { { '.', '.', '.', '.', '.', '.', '.'},
