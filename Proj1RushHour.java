@@ -16,51 +16,61 @@ public class Proj1RushHour {
 
     public Proj1RushHour() {
         mainpanel = new JPanel();
-        mainpanel.setLayout(new BoxLayout(mainpanel, BoxLayout.LINE_AXIS));
-        mainpanel.add(new GameDisplay());
-        mainpanel.add(Box.createRigidArea(new Dimension(5,0)));
+        mainpanel.setLayout(new BorderLayout());
+        mainpanel.add(new GameDisplay(), BorderLayout.CENTER);
 
-        Box rightPane = Box.createVerticalBox();
-        rightPane.add(new JLabel("Welcome to the CSC 540 team of:  "));
-        rightPane.add(new JLabel("Brian Hrebec"));
-        rightPane.add(new JLabel("Thomas Shaddox"));
-        rightPane.add(Box.createRigidArea(new Dimension(0, 15)));
+        Box label = Box.createVerticalBox();
+        label.add(new JLabel("CSC 540 team:  "));
+        label.add(new JLabel("Brian Hrebec"));
+        label.add(new JLabel("Thomas Shaddox"));
+        label.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
+        JPanel select = new JPanel();
+        select.setLayout(new BorderLayout());
         String[] cb = {"Select a board"};
         boardCombo = new JComboBox(cb);
-        JPanel wrapper = new JPanel();
-        wrapper.setLayout(new BorderLayout());
-        wrapper.add(boardCombo, BorderLayout.CENTER);
-        wrapper.setPreferredSize(new Dimension(200, 20));
-
-        rightPane.add(wrapper);
-        rightPane.add(new JButton(new AbstractAction("Solve!") {
+        select.add(boardCombo, BorderLayout.NORTH);
+        select.add(Box.createVerticalStrut(10), BorderLayout.CENTER);
+        select.add(new JButton(new AbstractAction("Solve!") {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(mainpanel, 
                 "This will eventually start the solving process");
             }
-        }));
-        rightPane.add(new JLabel("Max Tree Depth: "));
-        rightPane.add(new JLabel("States Generated: "));
-        rightPane.add(new JLabel("Other Fun info: "));
+        }), BorderLayout.SOUTH);
+        select.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
+        Box info = Box.createVerticalBox();
+        info.add(new JLabel("Max Tree Depth: "));
+        info.add(new JLabel("States Generated: "));
+        info.add(new JLabel("Other Fun info: "));
+        info.add(Box.createVerticalStrut(10));
         animateButton = new JButton(new AbstractAction("Replay Animation") {
             public void actionPerformed(ActionEvent e) {
             }
         });
         animateButton.setEnabled(false);
+        info.add(animateButton);
+        info.setBorder(BorderFactory.createEmptyBorder(10,15,20,10));
 
-        rightPane.add(animateButton);
+        JPanel options = new JPanel();
+        options.setLayout(new BorderLayout());
+        options.add(select, BorderLayout.NORTH);
+        options.add(info, BorderLayout.SOUTH);
 
-        rightPane.add(Box.createVerticalGlue());
+        JPanel sidepanel = new JPanel();
+        sidepanel.setLayout(new BorderLayout());
+        sidepanel.add(label, BorderLayout.NORTH);
+        sidepanel.add(Box.createHorizontalStrut(200), BorderLayout.CENTER);
+        sidepanel.add(options, BorderLayout.SOUTH);
 
-        mainpanel.add(rightPane);
-        mainpanel.add(Box.createRigidArea(new Dimension(5,0)));
+        mainpanel.add(sidepanel, BorderLayout.EAST);
     }
     public static void createGui() {
         Proj1RushHour proj = new Proj1RushHour();
 
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
+        frame.setMinimumSize(new Dimension(600, 400));
         frame.setContentPane(proj.mainpanel);
         
         frame.pack();
