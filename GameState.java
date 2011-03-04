@@ -6,7 +6,7 @@ public class GameState
      * 
      * @param  g   the given RushHour game.
      */
-    public char[][] getInitialGame(int g)
+    public static char[][] getInitialGame(int g)
     {
         
         // Known range of valid initial game states {
