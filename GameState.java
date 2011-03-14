@@ -11,7 +11,7 @@ public class GameState
         
         // Known range of valid initial game states {
         if (g > 0 && g <= initialGameStateCount())  {
-            return (char [][]) tempboard[g-1];  // Return initial game state
+            return (char [][]) boards[g-1];  // Return initial game state
         }
 		else
 		{
@@ -26,12 +26,12 @@ public class GameState
      */
     public static int initialGameStateCount()
     {
-        return tempboard.length;
+        return boards.length;
     } // end initialGameStates
 
     // This declaration is put at the bottom because it's so big and would 
     // obscure the methods
-    final static private char tempboard[][][] = {
+    final static private char boards[][][] = {
              
 			// RushHour Railroad card 0, Blank, 0 move solution
             { { '.', '.', '.', '.', '.', '.', '.'},
