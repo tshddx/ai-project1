@@ -24,7 +24,8 @@ public class Proj1RushHour {
     public Proj1RushHour() {
         mainpanel = new JPanel();
         mainpanel.setLayout(new BorderLayout());
-        mainpanel.add(new GameDisplay(), BorderLayout.CENTER);
+        solutionDisplay = new GameDisplay();
+        mainpanel.add(solutionDisplay, BorderLayout.CENTER);
 
         Box label = Box.createVerticalBox();
         label.add(new JLabel("CSC 540 team:  "));
@@ -36,6 +37,17 @@ public class Proj1RushHour {
         select.setLayout(new BorderLayout());
         String[] comboVals = initBoardCombo();
         boardCombo = new JComboBox(comboVals);
+        boardCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String i = boardCombo.getSelectedItem().toString();
+                if (i == "Select a board...") {
+                    solutionDisplay.setBoardNull();
+                } else {
+                    solutionDisplay.setBoard(GameState.getInitialGame(Integer.parseInt(i)));
+                }
+                solutionDisplay.repaint();
+            }
+        });
         select.add(boardCombo, BorderLayout.NORTH);
         select.add(Box.createVerticalStrut(10), BorderLayout.CENTER);
         select.add(new JButton(new AbstractAction("Solve!") {
@@ -47,12 +59,14 @@ public class Proj1RushHour {
         select.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
         Box info = Box.createVerticalBox();
+        info.add(new JLabel("Moves in Solution: "));
         info.add(new JLabel("Max Tree Depth: "));
         info.add(new JLabel("States Generated: "));
         info.add(new JLabel("Other Fun info: "));
         info.add(Box.createVerticalStrut(10));
         animateButton = new JButton(new AbstractAction("Replay Animation") {
             public void actionPerformed(ActionEvent e) {
+                solutionDisplay.startAnimation();
             }
         });
         animateButton.setEnabled(false);
