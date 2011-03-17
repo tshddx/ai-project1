@@ -1,9 +1,9 @@
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 public class Board {
 	private int boardSize;
 	private char board[][];
+	ArrayList<Board> moves = new ArrayList<Board>();
 	// For now
 	private static char testBoard[][] =
 	    { { '.', '.', '.', '.', 'O', 'O', 'O'},
@@ -17,6 +17,7 @@ public class Board {
 	public Board(int boardSize, char[][] board) {
 		this.boardSize = boardSize;
 		this.board = board;
+		// call validMoves
 	}
 
 	public String toString() {
@@ -78,9 +79,79 @@ public class Board {
      * Return an array of all Board objects reachable from the current Board in a single move.
      */
 	public Board[] validMoves() {
+	    // Iterate through rows
+	    for (int i = 0; i < boardSize; i++) {
+            int emptyBefore, emptyAfter = 0;
+	        int pieceLength, pieceStart = 0;
+            char piece = ' ';
+            // char lastChar = ' ';
+            boolean hadPiece = false;
+	        for (int j = 0; j < boardSize; j++) {
+                if (board[i][j] == '.') {
+                    if (piece != ' ') {
+                        // Done with a piece
+                        if (hadPiece) {
+                            // Start after spacing
+                            emptyAfter++;
+                            if (j = boardSize - 1) {
+                                addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i);
+                            }
+                        }
+                        else {
+                            // Never had a peice, only seen vertical pieces
+                            emptyBefore++;
+                        }
+                    }
+                    else {
+                        if (hadPiece) {
+                            // between pieces
+                            emptyAfter++;
+                        }
+                        else {
+                            // Still blank from beginning
+                            emptyBefore++;
+                        }
+                    }
+                }
+                else {
+                    // on piece square
+                    if (board[i][j] == piece) {
+                        // is a continued piece
+                        // TODO: check for square or regular
+                        hadPiece = true;
+                        pieceLength++;
+                        if (j = boardSize - 1) {
+                            addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i);
+                        }
+                    }
+                    else {
+                        // found new piece
+                        if (hadPiece) {
+                            // add moves for last piece (using empty after spaces)
+                            addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i);
+                            emptyBefore = emptyAfter;
+                        }
+                        else {
+                            // Never had a peice, found first piece, doesn't mean anything
+                        }
+                        piece = board[i][j];
+                        pieceLength = 1;
+                        pieceStart = j;
+                    }
+                }
+            }
+            if (hadPiece)
+        }
 		System.out.println("whatever");
-		return new Board[1];
+		return new ArrayList <Board>;
 	}
+	
+	private void addGameStates(char piece, int pieceStart, int pieceLength, int emptyBefore, int emptyAfter, int row) {
+        // add game states to array list
+        for (int i = 0; i < (emptyAfter + emptyBefore); i++) {
+            Board b = new Board(boardSize, board);
+        }
+    }
 	
 	public static void main(String args[]) {
 		Board b = new Board(7, testBoard);
