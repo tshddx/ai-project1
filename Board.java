@@ -3,7 +3,12 @@ import java.util.*;
 public class Board {
 	private int boardSize;
 	private char board[][];
+    Board parent;
+
 	ArrayList<Board> moves = new ArrayList<Board>();
+
+    int mMaxTreeDepth;
+    int mStatesGenerated;
 	// For now
 	private static char testBoard[][] =
 	    { { '.', '.', '.', '.', 'O', 'O', 'O'},
@@ -17,6 +22,7 @@ public class Board {
 	public Board(int boardSize, char[][] board) {
 		this.boardSize = boardSize;
 		this.board = board;
+        this.parent = null;
 		// call validMoves
 	}
 
@@ -25,6 +31,17 @@ public class Board {
      */
     public int size() {
         return boardSize;
+    }
+
+    private boolean isBoardBlank() {
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                if (board[i][j] != '.')
+                    return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -63,8 +80,58 @@ public class Board {
         ret.add(new Board(7, b2));
         ret.add(new Board(7, b3));
         return ret;
+
+        /*
+        mMaxTreeDepth = 0;
+        mStatesGenerated = 0;
+
+        // Find the special case blank board.
+        if (isBoardBlank())
+            return new ArrayList<Board>();
+        
+        // Run BFS
+        Queue<Board> ready = new LinkedList<Board>();
+        HashSet<Board> markedBoards = new HashSet<Board>();
+        ready.offer(this);
+        markedBoards.add(this);
+        Board currentBoard;
+        for(;;) {
+            currentBoard = ready.poll();
+
+            // TODO: pre-find row to check?
+            if (currentBoard.solved())
+                break;
+
+            // TODO: push moves into queue directly?
+            List<Board> moves = validMoves();
+            for (Board m : moves) {
+                if (!markedBoards.contains(m)) {
+                    markedBoards.add(m);
+                    ready.offer(m);
+                }
+            }
+        }
+
+        //TODO: set tree depth
+        mStatesGenerated = markedBoards.size();
+        
+        // Trace back up through tree and generate the solution
+        List<Board> solution = new ArrayList<Board>();
+        while (currentBoard.parent != null) {
+            solution.add(parent);
+            currentBoard = currentBoard.parent;
+        }
+
+        Collections.reverse(solution);
+        return solution;
+        */
     }
 
+    /**
+     * Converts to a string.
+     *
+     * @return String representation of this board
+     */
 	public String toString() {
 		StringBuilder s = new StringBuilder();
 		for (int i = 0; i < boardSize; i++) {
@@ -75,7 +142,31 @@ public class Board {
 		}
 		return s.toString();
 	}
-	
+
+    /**
+     * Returns true if this baord represents a 'solved' state.
+     *
+     * @return true if solved, false otherwise
+     */
+    public boolean solved() {
+        int col = boardSize - 1;
+        for (int i = 0; i < boardSize; i++) {
+            if (board[i][col] == 'X') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public int maxTreeDepth() {
+        return mMaxTreeDepth;
+    }
+
+	public int totalStates() {
+        return mStatesGenerated;
+    }
+
 	/**
      * Return a character array representing a certain column, zero indexed.
      */
