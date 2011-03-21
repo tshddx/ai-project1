@@ -1,10 +1,13 @@
 
+/**
+ * Provides rushhour boards to solve.
+ */
 public class GameState
 {
     /**
      * Game piece positions for the given RushHour game.
      * 
-     * @param  g   the given RushHour game.
+     * @param  g   the RushHour game required.
      */
     static public Board getInitialGame(int g)
     {
@@ -22,7 +25,7 @@ public class GameState
 
 	
     /**
-     * Return the number of possible initial states of RushHour game.
+     * Return the number of RushHour games available.
      */
     public static int initialGameStateCount()
     {
@@ -411,7 +414,7 @@ public class GameState
               { 'E', 'V', 'V', '.', 'R', 'R', 'R'},
               { 'E', 'V', 'V', '.', '.', '.', '.'} }
 			  
-		};  // end of declaration and initialization of tempboard[][][]
+		};  // end of declaration and initialization of boards[][][]
     
 } // end GameState	   
 

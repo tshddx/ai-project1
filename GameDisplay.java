@@ -6,6 +6,9 @@ import java.awt.Point;
 import java.awt.Font;
 import java.util.*;
 
+/**
+ * GUI component to display a rushhour board or rushhour board animation.
+ */
 public class GameDisplay extends JPanel {
     boolean mBoardIsNull;
     Board mBoard;
@@ -17,21 +20,30 @@ public class GameDisplay extends JPanel {
 	HashMap<Character, Color> mColorMap;
 	
 	double mAnimPercentComplete;
-	double mAnimSpeed; // milliseconds per move
+	int mAnimSpeed; // milliseconds per move
 	int state;
 	boolean animating;
 	Date lastTime;
 	
+    /**
+     * Constructs a new GameDisplay object, displaying a null board
+     */
     public GameDisplay() {
         setPreferredSize(new Dimension(400, 400));
         setBackground(Color.WHITE);
         mBoardIsNull = true;
 		mAnimPercentComplete = 0.0;
-		mAnimSpeed = 2000.0;
+		mAnimSpeed = 2000;
 		animating = false;
 		mColorMap = new HashMap<Character, Color>();
     }
 
+    /**
+     * Sets the displayed board to 'board'. If playing, stops the currently
+     * animating animation.
+     *
+     * @param board the board to display
+     */
     public void setBoard(Board board) {
         mBoard = board;
         mBoardIsNull = false;
@@ -39,10 +51,19 @@ public class GameDisplay extends JPanel {
 		setColors();
     }
     
+    /**
+     * Set the current board to null
+     */
     public void setBoardNull() {
         mBoardIsNull = true;
     }
     
+    /**
+     * Sets the current animation and displays the first frame, with the
+     * animation paused.
+     *
+     * @param boards list of boards in the animation
+     */ 
     public void setAnimation(List<Board> boards) {
         mAnimation = boards;
         resetAnimation();
@@ -50,12 +71,24 @@ public class GameDisplay extends JPanel {
         setColors();
     }
 
+    /**
+     * Resets the animation back to the first frame and pauses it.
+     */
 	public void resetAnimation() {
 		mAnimPercentComplete = 0.0;
 		setState(0);
 		animating = false;
 	}
 	
+    /**
+     * Starts playing the animation from the current frame. It will 
+     * be updated each time the component is repainted. The 
+     * animation will be played back at the
+     * speed set by setAnimationSpeed (default 2000).
+     *
+     * When the animation is finished, it will stop on the last frame. After
+     * this happens, isAnimating() will return false.
+     */
     public void startAnimation() {
 		lastTime = new Date();
         if (state == mAnimation.size() - 1)
@@ -63,23 +96,88 @@ public class GameDisplay extends JPanel {
 		animating = true;
     }
 	
-	/*
-	 * speed is in ms per move
-	 *
+	/**
+	 * Set the speed at which to play the animation.
+     * Note that this is in a constant time per move. (For clarity.)
+     *
+     * @param speed speed in milliseconds per move
 	 */
-	public void setAnimationSpeed(double speed) {
+	public void setAnimationSpeed(int speed) {
 		mAnimSpeed = speed;
 	}
 
+    /**
+     * Pauses the animation on the current frame
+     */
     public void pauseAnimation() {
 		animating = false;
     }
 	
+    /**
+     * Determine whether the animation is currently playing.
+     *
+     * @return true if the animation is currently playing.
+     */
 	public boolean isAnimating() {
 		return animating;
 	}
 	
-	public void stepAnimation() {
+    /**
+     * Sets the current state (or move) in the animation. If the provided
+     * state number is out of range, the board will be set to null.
+     *
+     * @param s state number to make current.
+     */
+    public void setState(int s) {
+		state = s;
+
+        // Reset the animation
+		mAnimPercentComplete = 0.0;
+
+        if (mAnimation == null)
+            return;
+
+		mBoard = mAnimation.get(state);
+        mAnimPiece = 0;
+
+		if (state < mAnimation.size() - 1 && state >= 0) {
+			mBoardNext = mAnimation.get(state + 1);
+			
+            // Compare the boards and look for a mismatch
+			for (int i = 0; i < mBoard.size(); i++) {
+				for (int j = 0; j < mBoard.size(); j++) {
+					char p = mBoard.get(i, j);
+					if (p != '.' && p != mBoardNext.get(i, j)) {
+                        // This piece doesn't match, so it must be animated.
+                        
+                        // Find its new location.
+						mAnimNewLoc = getULCornerFor(mBoardNext, p);
+						mAnimOldLoc = new Point(i, j);
+						mAnimPiece = p;
+						return;
+					}
+				}
+			}
+		} else {
+			mBoardNext = null;
+        }
+    }
+
+    /**
+     * Returns the current state (move) of the animation.
+     *
+     * @return the current state number
+     */
+    public int getState() {
+        return state;
+    }
+
+    /**
+     * Advance the animation the proper amount for the time passed.
+     *
+     * Side effects: updates lastTime with the current time.
+     */
+	private void stepAnimation() {
 		if (mBoardNext == null)
 			animating = false;
 			
@@ -92,12 +190,18 @@ public class GameDisplay extends JPanel {
 		if (mAnimPercentComplete >= 1.0) {
 			setState(state + 1);
 		} else {
-			mAnimPercentComplete += delta / mAnimSpeed;
+			mAnimPercentComplete += (double)delta / mAnimSpeed;
 		}
 		
 		lastTime = now;
 	}
 	
+    /**
+     * Assigns a random color for each piece in the current board, if a color
+     * was not assigned already.
+     *
+     * Side effects: updates mColorMap.
+     */
 	private void setColors() {
         if (mBoard == null) {
             return;
@@ -120,6 +224,13 @@ public class GameDisplay extends JPanel {
 		}
 	}
 
+    /**
+     * Finds the upper-left-most occurence of a particular piece in the given
+     * board.
+     *
+     * @param board the board to search
+     * @param piece the piece to search for
+     */
 	private Point getULCornerFor(Board board, char piece) {
 		for (int i = 0; i < board.size(); i++) {
 			for (int j = 0; j < board.size(); j++) {
@@ -131,51 +242,24 @@ public class GameDisplay extends JPanel {
 		return null;
 	}
 	
-    public void setState(int s) {
-		state = s;
-		mAnimPercentComplete = 0.0;
-
-        if (mAnimation == null)
-            return;
-
-		mBoard = mAnimation.get(state);
-		
-		if (state < mAnimation.size() - 1) {
-			mBoardNext = mAnimation.get(state + 1);
-			
-			for (int i = 0; i < mBoard.size(); i++) {
-				for (int j = 0; j < mBoard.size(); j++) {
-					char p = mBoard.get(i, j);
-					if (p != '.' && p != mBoardNext.get(i, j)) {
-						mAnimNewLoc = getULCornerFor(mBoardNext, p);
-						mAnimOldLoc = new Point(i, j);
-						mAnimPiece = p;
-						return;
-					}
-				}
-			}
-		} else {
-			mBoardNext = null;
-        }
-    }
-
-    public int getState() {
-        return state;
-    }
-
+    /**
+     * Draws the pieces on the board
+     */
 	private void drawPieces(Graphics g, int x, int y, int sqouter) {
 		int sqx, sqy = x + 5;
         for (int j = 0; j < mBoard.size(); j++) {
 			sqx = x + 5;
             for (int i = 0; i < mBoard.size(); i++) {
                 char piece = mBoard.get(i, j);
-				if (piece != '.') {
+				if (piece != '.') { // Empty squares are not drawn
 					g.setColor(mColorMap.get(piece));
 					int px, py;
 					px = sqx - 5;
 					py = sqy - 5;
 					
 					if (piece == mAnimPiece) {
+                        // This is the animated piece, move it a percentage of
+                        // the way toward its destination.
 						int offsetX = i - mAnimOldLoc.x;
 						int offsetY = j - mAnimOldLoc.y;
 						int nx = x + (mAnimNewLoc.x + offsetX) * sqouter;
@@ -191,6 +275,15 @@ public class GameDisplay extends JPanel {
 			sqy += sqouter;
 		}
 	}
+
+    /**
+     * Overridden paint method. Draws the rushhour board and advances the
+     * animation as needed.
+     *
+     * Do not call directly. Call repaint() as needed instead.
+     *
+     * @param g
+     */
     public void paint(Graphics g) {
         int x = 25;
         int y = 25;

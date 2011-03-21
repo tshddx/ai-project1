@@ -25,6 +25,9 @@ public class Proj1RushHour {
     JSlider stateSlider;
     SpinnerNumberModel stateSpinner;
 
+    /**
+     * Initialize the board selection combo box
+     */
     public String[] initBoardCombo() {
         String[] ret = new String[1 + GameState.initialGameStateCount()];
         ret[0] = "Select a board...";
@@ -35,7 +38,12 @@ public class Proj1RushHour {
         return ret;
     }
 
+    /**
+     * Constructor for the main gui panel.
+     */
     public Proj1RushHour() {
+
+        // Create the animation timer
 		animTimer = new Timer(17, new ActionListener() { // ~60 fps
 			public void actionPerformed(ActionEvent e) {
 				solutionDisplay.repaint();
@@ -50,11 +58,13 @@ public class Proj1RushHour {
 			}
 		}); 
 		
+        // Create the main panel and layout
         mainpanel = new JPanel();
         mainpanel.setLayout(new BorderLayout());
         solutionDisplay = new GameDisplay();
         mainpanel.add(solutionDisplay, BorderLayout.CENTER);
 
+        // Create the sidebar credit box
         Box credits = Box.createVerticalBox();
         credits.add(new JLabel("CSC 540 team:  "));
         credits.add(new JLabel("Brian Hrebec"));
@@ -65,10 +75,13 @@ public class Proj1RushHour {
 		credits.add(new JLabel("vehicle is always red."));
         credits.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
+        // Create the sidebar board selection box
         JPanel select = new JPanel();
         select.setLayout(new BorderLayout());
         String[] comboVals = initBoardCombo();
         boardCombo = new JComboBox(comboVals);
+
+        // ActionListener for board selection combo box
         boardCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String i = boardCombo.getSelectedItem().toString();
@@ -95,6 +108,8 @@ public class Proj1RushHour {
         });
         select.add(boardCombo, BorderLayout.NORTH);
         select.add(Box.createVerticalStrut(10), BorderLayout.CENTER);
+
+        // ActionListener for "Solve!" button
         select.add(new JButton(new AbstractAction("Solve!") {
             public void actionPerformed(ActionEvent e) {
                 if (currentBoard == null) {
@@ -120,9 +135,11 @@ public class Proj1RushHour {
         }), BorderLayout.SOUTH);
         select.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
+        // Create the solution information and animation control sidebar area
         JPanel info = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
+        // Info boxes
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = 0;
@@ -150,6 +167,7 @@ public class Proj1RushHour {
         c.gridwidth = GridBagConstraints.REMAINDER;
         info.add(Box.createVerticalStrut(10), c);
 
+        // Animation controls
         c.gridy = 4;
         animateButton = new JButton(new AbstractAction("Play Animation") {
             public void actionPerformed(ActionEvent e) {
@@ -178,6 +196,7 @@ public class Proj1RushHour {
         c.weightx = 1;
         info.add(new JLabel("milliseconds/move: "), c);
 
+        // Speed Spinner
         c.gridx = 1;
         c.weightx = .5; 
         mspmSpeed = new SpinnerNumberModel(2000, 100, 4000, 100);
@@ -189,6 +208,7 @@ public class Proj1RushHour {
         });
         info.add(new JSpinner(mspmSpeed), c);
 
+        // State Slider
         c.gridx = 0;
         c.gridy = 7;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -209,6 +229,7 @@ public class Proj1RushHour {
         });
         info.add(stateSlider, c);
 
+        // State Spinner
         c.gridx = 0;
         c.gridy = 8;
         c.gridwidth = 1;
@@ -231,6 +252,7 @@ public class Proj1RushHour {
 
         info.setBorder(BorderFactory.createEmptyBorder(10,15,20,10));
 
+        // Put the gui together
         JPanel options = new JPanel();
         options.setLayout(new BorderLayout());
         options.add(select, BorderLayout.NORTH);
@@ -244,20 +266,26 @@ public class Proj1RushHour {
 
         mainpanel.add(sidepanel, BorderLayout.EAST);
     }
+
+    /** 
+     * Create and display the frame.
+     */
     public static void createGui() {
+        Proj1RushHour proj = new Proj1RushHour(); // create the main panel
 
-		
-        Proj1RushHour proj = new Proj1RushHour();
-
+        // Application Frame
         JFrame frame = new JFrame("Rush Hour - CSC540 Project 1");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         frame.setMinimumSize(new Dimension(600, 400));
-        frame.setContentPane(proj.mainpanel);
+        frame.setContentPane(proj.mainpanel); // Add the panel to the frame
         
         frame.pack();
         frame.setVisible(true);
     }
 
+    /** 
+     * Entry Point. Basic swing loop.
+     */
     public static void main(String args[]) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
