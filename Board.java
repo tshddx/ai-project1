@@ -3,12 +3,12 @@ import java.util.*;
 public class Board {
 	private int boardSize;
 	private char board[][];
-    Board parent;
+    private Board parent;
+    private int protagRow;
+    private int depth;
 
 	ArrayList<Board> moves = new ArrayList<Board>();
 
-    int mMaxTreeDepth;
-    int mStatesGenerated;
 	// For now
 	private static char testBoard[][] =
 	    { { '.', '.', '.', '.', 'O', 'O', 'O'},
@@ -23,6 +23,26 @@ public class Board {
 		this.boardSize = boardSize;
 		this.board = board;
         this.parent = null;
+        this.depth = 0;
+
+        // Find the row that the protagonist vehicle is on
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                if (board[i][j] == 'X') {
+                    this.protagRow = i;
+                    return;
+                }
+            }
+        }
+		// call validMoves
+	}
+
+	public Board(Board parent, char[][] board) {
+		this.boardSize = parent.size();
+		this.board = board;
+        this.parent = parent;
+        this.depth = parent.depth + 1;
+        this.protagRow = parent.protagRow;
 		// call validMoves
 	}
 
@@ -82,8 +102,8 @@ public class Board {
         return ret;
 
         /*
-        mMaxTreeDepth = 0;
-        mStatesGenerated = 0;
+        maxdepth = 0;
+        int totalstates = 0;
 
         // Find the special case blank board.
         if (isBoardBlank())
@@ -110,6 +130,12 @@ public class Board {
                     ready.offer(m);
                 }
             }
+
+            //if (markedBoards.size() > totalstates + 1000) {
+            //    totalstates = markedBoards.size();
+            //    Proj1RushHour.updateInfo(totalstates);
+            //}
+            
         }
 
         //TODO: set tree depth
@@ -149,22 +175,10 @@ public class Board {
      * @return true if solved, false otherwise
      */
     public boolean solved() {
-        int col = boardSize - 1;
-        for (int i = 0; i < boardSize; i++) {
-            if (board[i][col] == 'X') {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public int maxTreeDepth() {
-        return mMaxTreeDepth;
-    }
-
-	public int totalStates() {
-        return mStatesGenerated;
+        if (board[protagRow][boardSize - 1] == 'X')
+            return true;
+        else 
+            return false;
     }
 
 	/**
