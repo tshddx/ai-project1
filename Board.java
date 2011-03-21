@@ -20,6 +20,51 @@ public class Board {
 		// call validMoves
 	}
 
+    /**
+     * Return the size of this board
+     */
+    public int size() {
+        return boardSize;
+    }
+
+    /**
+     * Solves this board, and returns a list of the solution boards
+     * in order
+     */
+    public List<Board> solve() {
+        // TODO: remove the following
+        // hardcoded testing code
+        List<Board> ret = new ArrayList<Board>();
+        char[][] b1 = { { '.', '.', '.', '.', 'O', 'O', 'O'},
+              { '.', '.', '.', '.', 'A', 'B', 'C'},
+              { '.', '.', 'X', 'X', 'A', 'B', 'C'},
+              { '.', '.', '.', '.', 'P', 'P', 'P'},
+              { '.', '.', '.', '.', '.', '.', '.'},
+              { '.', '.', '.', '.', '.', '.', '.'},
+              { '.', '.', '.', '.', '.', '.', '.'} };
+
+		char[][] b2 = { { 'O', 'O', 'O', '.', '.', '.', '.'},
+              { '.', '.', '.', '.', 'A', 'B', 'C'},
+              { '.', '.', 'X', 'X', 'A', 'B', 'C'},
+              { '.', '.', '.', '.', 'P', 'P', 'P'},
+              { '.', '.', '.', '.', '.', '.', '.'},
+              { '.', '.', '.', '.', '.', '.', '.'},
+              { '.', '.', '.', '.', '.', '.', '.'} };
+
+		char[][] b3 = { { 'O', 'O', 'O', '.', '.', '.', '.'},
+              { '.', '.', '.', '.', 'A', 'B', 'C'},
+              { '.', '.', 'X', 'X', 'A', 'B', 'C'},
+              { '.', 'P', 'P', 'P', '.', '.', '.'},
+              { '.', '.', '.', '.', '.', '.', '.'},
+              { '.', '.', '.', '.', '.', '.', '.'},
+              { '.', '.', '.', '.', '.', '.', '.'} };
+
+        ret.add(new Board(7, b1));
+        ret.add(new Board(7, b2));
+        ret.add(new Board(7, b3));
+        return ret;
+    }
+
 	public String toString() {
 		StringBuilder s = new StringBuilder();
 		for (int i = 0; i < boardSize; i++) {
@@ -54,6 +99,13 @@ public class Board {
 	}
 	return r;
 	}
+
+    /**
+     * Return the piece at position x, y
+     */
+	public char get(int x, int y) {
+        return board[y][x];
+    }
 	
     /**
      * Given a row (or column) as a character array, return a character array of the pieces in it.
@@ -78,11 +130,11 @@ public class Board {
     /**
      * Return an array of all Board objects reachable from the current Board in a single move.
      */
-	public Board[] validMoves() {
+	public List<Board> validMoves() {
 	    // Iterate through rows
 	    for (int i = 0; i < boardSize; i++) {
-            int emptyBefore, emptyAfter = 0;
-	        int pieceLength, pieceStart = 0;
+            int emptyBefore = 0, emptyAfter = 0;
+	        int pieceLength = 0, pieceStart = 0;
             char piece = ' ';
             // char lastChar = ' ';
             boolean hadPiece = false;
@@ -93,7 +145,7 @@ public class Board {
                         if (hadPiece) {
                             // Start after spacing
                             emptyAfter++;
-                            if (j = boardSize - 1) {
+                            if (j == boardSize - 1) {
                                 addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i);
                             }
                         }
@@ -120,7 +172,7 @@ public class Board {
                         // TODO: check for square or regular
                         hadPiece = true;
                         pieceLength++;
-                        if (j = boardSize - 1) {
+                        if (j == boardSize - 1) {
                             addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i);
                         }
                     }
@@ -141,9 +193,11 @@ public class Board {
                 }
             }
             if (hadPiece)
+                ;
         }
+
 		System.out.println("whatever");
-		return new ArrayList <Board>;
+		return new ArrayList <Board>();
 	}
 	
 	private void addGameStates(char piece, int pieceStart, int pieceLength, int emptyBefore, int emptyAfter, int row) {

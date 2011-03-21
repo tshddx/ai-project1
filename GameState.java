@@ -6,12 +6,12 @@ public class GameState
      * 
      * @param  g   the given RushHour game.
      */
-    public char[][] getInitialGame(int g)
+    static public Board getInitialGame(int g)
     {
         
         // Known range of valid initial game states {
         if (g > 0 && g <= initialGameStateCount())  {
-            return (char [][]) boards[g-1];  // Return initial game state
+            return new Board(7, boards[g-1]);  // Return initial game state
         }
 		else
 		{

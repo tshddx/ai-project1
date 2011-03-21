@@ -3,58 +3,26 @@ import java.awt.event.*;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.util.List;
 
 public class Proj1RushHour {
-final static private char testAnim[][][] = {
-			// RushHour Railroad card 1, Junior, 5 move solution
-            { { '.', '.', '.', '.', 'O', 'O', 'O'},
-              { '.', '.', '.', '.', 'B', 'B', 'C'},
-              { '.', '.', 'X', 'X', 'B', 'B', 'C'},
-              { '.', '.', '.', '.', 'P', 'P', 'P'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', '.'} },
-			{ { 'O', 'O', 'O', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', 'B', 'B', 'C'},
-              { '.', '.', 'X', 'X', 'B', 'B', 'C'},
-              { '.', '.', '.', '.', 'P', 'P', 'P'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', '.'} },
-			{ { 'O', 'O', 'O', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', 'B', 'B', 'C'},
-              { '.', '.', 'X', 'X', 'B', 'B', 'C'},
-              { '.', 'P', 'P', 'P', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', '.'} },
-			{ { 'O', 'O', 'O', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', 'C'},
-              { '.', '.', 'X', 'X', '.', '.', 'C'},
-              { '.', 'P', 'P', 'P', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', 'B', 'B', '.'},
-              { '.', '.', '.', '.', 'B', 'B', '.'} },
-			{ { 'O', 'O', 'O', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { '.', '.', 'X', 'X', '.', '.', 'C'},
-              { '.', 'P', 'P', 'P', '.', '.', 'C'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', 'B', 'B', '.'},
-              { '.', '.', '.', '.', 'B', 'B', '.'} },
-			{ { 'O', 'O', 'O', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { 'X', 'X', '.', '.', '.', '.', 'C'},
-              { '.', 'P', 'P', 'P', '.', '.', 'C'},
-              { '.', '.', '.', '.', '.', '.', '.'},
-              { '.', '.', '.', '.', 'B', 'B', '.'},
-              { '.', '.', '.', '.', 'B', 'B', '.'} }
-			  };
     JPanel mainpanel;
     GameDisplay solutionDisplay;
     JButton animateButton;
     JComboBox boardCombo;
 	Timer animTimer;
+    Board currentBoard;
+
+    JLabel movesInSolution;
+    JLabel maxTreeDepth;
+    JLabel statesGenerated;
+
+    SpinnerNumberModel mspmSpeed;
+
+    JSlider stateSlider;
+    SpinnerNumberModel stateSpinner;
 
     public String[] initBoardCombo() {
         String[] ret = new String[1 + GameState.initialGameStateCount()];
@@ -70,8 +38,13 @@ final static private char testAnim[][][] = {
 		animTimer = new Timer(17, new ActionListener() { // ~60 fps
 			public void actionPerformed(ActionEvent e) {
 				solutionDisplay.repaint();
-				if (!solutionDisplay.isAnimating())
+                
+				if (solutionDisplay.isAnimating()) {
+                    stateSlider.setValue(solutionDisplay.getState());
+                    stateSpinner.setValue(solutionDisplay.getState());
+                } else {
 					animTimer.stop();
+                }
 			}
 		}); 
 		
@@ -96,9 +69,22 @@ final static private char testAnim[][][] = {
                 String i = boardCombo.getSelectedItem().toString();
                 if (i == "Select a board...") {
                     solutionDisplay.setBoardNull();
+                    currentBoard = null;
                 } else {
-                    solutionDisplay.setBoard(GameState.getInitialGame(Integer.parseInt(i)));
+                    currentBoard = GameState.getInitialGame(Integer.parseInt(i));
+                    solutionDisplay.setBoard(currentBoard);
                 }
+
+                movesInSolution.setText("");
+                maxTreeDepth.setText("");
+                statesGenerated.setText("");
+                animateButton.setEnabled(true);
+                solutionDisplay.setAnimation(null);
+                stateSlider.setValue(0);
+                stateSlider.setMaximum(0);
+                stateSpinner.setValue(0);
+                stateSpinner.setMaximum(0);
+
                 solutionDisplay.repaint();
             }
         });
@@ -106,28 +92,99 @@ final static private char testAnim[][][] = {
         select.add(Box.createVerticalStrut(10), BorderLayout.CENTER);
         select.add(new JButton(new AbstractAction("Solve!") {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(mainpanel, 
-                "This will eventually start the solving process");
+                List<Board> solution = currentBoard.solve();
+                animateButton.setEnabled(true);
+				solutionDisplay.setAnimation(solution);
+                stateSlider.setMaximum(solution.size() - 1);
+                stateSpinner.setMaximum(solution.size() - 1);
+                movesInSolution.setText(Integer.toString(solution.size()));
+                maxTreeDepth.setText("??");
+                statesGenerated.setText("??");
             }
         }), BorderLayout.SOUTH);
         select.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-        Box info = Box.createVerticalBox();
-        info.add(new JLabel("Moves in Solution: "));
-        info.add(new JLabel("Max Tree Depth: "));
-        info.add(new JLabel("States Generated: "));
-        info.add(new JLabel("Other Fun info: "));
-        info.add(Box.createVerticalStrut(10));
-        animateButton = new JButton(new AbstractAction("Test Animation") {
+        JPanel info = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        info.add(new JLabel("Moves in Solution: "), c);
+        c.gridx = 2;
+        movesInSolution = new JLabel("");
+        info.add(movesInSolution, c);
+
+        c.gridx = 0;
+        c.gridy = 1;
+        info.add(new JLabel("Max Tree Depth: "), c);
+        c.gridx = 2;
+        maxTreeDepth = new JLabel("");
+        info.add(maxTreeDepth, c);
+
+        c.gridx = 0;
+        c.gridy = 2;
+        info.add(new JLabel("States Generated: "), c);
+        c.gridx = 2;
+        statesGenerated = new JLabel("");
+        info.add(statesGenerated, c);
+
+        c.gridx = 0;
+        c.gridy = 3;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        info.add(Box.createVerticalStrut(10), c);
+
+        c.gridy = 4;
+        animateButton = new JButton(new AbstractAction("Toggle Animation") {
             public void actionPerformed(ActionEvent e) {
-				solutionDisplay.setAnimation(testAnim);
-                solutionDisplay.startAnimation();
-				animTimer.start();
+                if (solutionDisplay.isAnimating()) {
+                    solutionDisplay.pauseAnimation();
+                    animTimer.stop();
+                } else {
+                    solutionDisplay.startAnimation();
+                    animTimer.start();
+                }
             }
         });
-        //animateButton.setEnabled(false);
-		
-        info.add(animateButton);
+
+        animateButton.setEnabled(false);
+        info.add(animateButton, c);
+
+        c.gridx = 0;
+        c.gridy = 5;
+        info.add(Box.createVerticalStrut(10), c);
+
+        c.gridx = 0;
+        c.gridy = 6;
+        c.gridwidth = 1;
+        c.weightx = 1;
+        info.add(new JLabel("milliseconds/move: "), c);
+
+        c.gridx = 1;
+        c.weightx = .5; 
+        mspmSpeed = new SpinnerNumberModel(2000, 100, 4000, 100);
+        info.add(new JSpinner(mspmSpeed), c);
+
+        c.gridx = 0;
+        c.gridy = 7;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        stateSlider = new JSlider(JSlider.HORIZONTAL, 0, 0, 0);
+        stateSlider.setPaintTicks(true);
+        stateSlider.setMajorTickSpacing(5);
+        stateSlider.setMinorTickSpacing(1);
+        stateSlider.setSnapToTicks(true);
+        info.add(stateSlider, c);
+
+        c.gridx = 0;
+        c.gridy = 8;
+        c.gridwidth = 1;
+        c.weightx = 1;
+        info.add(new JLabel("Solution State: "), c);
+        c.gridx = 1;
+        c.weightx = .5; 
+        stateSpinner = new SpinnerNumberModel(0, 0, 0, 1);
+        info.add(new JSpinner(stateSpinner), c);
+
         info.setBorder(BorderFactory.createEmptyBorder(10,15,20,10));
 
         JPanel options = new JPanel();

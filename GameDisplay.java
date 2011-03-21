@@ -8,9 +8,9 @@ import java.util.*;
 
 public class GameDisplay extends JPanel {
     boolean mBoardIsNull;
-    char[][] mBoard;
-	char[][] mBoardNext;
-	char[][][] mAnimation;
+    Board mBoard;
+	Board mBoardNext;
+	List<Board> mAnimation;
 	Point mAnimNewLoc;
 	Point mAnimOldLoc;
 	char mAnimPiece;
@@ -18,7 +18,7 @@ public class GameDisplay extends JPanel {
 	
 	double mAnimPercentComplete;
 	double mAnimSpeed; // milliseconds per move
-	int stage;
+	int state;
 	boolean animating;
 	Date lastTime;
 	
@@ -32,7 +32,7 @@ public class GameDisplay extends JPanel {
 		mColorMap = new HashMap<Character, Color>();
     }
 
-    public void setBoard(char[][] board) {
+    public void setBoard(Board board) {
         mBoard = board;
         mBoardIsNull = false;
 		animating = false;
@@ -43,17 +43,16 @@ public class GameDisplay extends JPanel {
         mBoardIsNull = true;
     }
     
-    public void setAnimation(char[][][] boards) {
-		mAnimation = boards;
-		resetAnimation();
-		mBoardIsNull = false;
-		animating = false;
-		setColors();
+    public void setAnimation(List<Board> boards) {
+        mAnimation = boards;
+        resetAnimation();
+        animating = false;
+        setColors();
     }
 
 	public void resetAnimation() {
 		mAnimPercentComplete = 0.0;
-		setStage(0);
+		setState(0);
 		animating = false;
 	}
 	
@@ -89,7 +88,7 @@ public class GameDisplay extends JPanel {
 		long delta = now.getTime() - lastTime.getTime();
 		
 		if (mAnimPercentComplete >= 1.0) {
-			setStage(stage + 1);
+			setState(state + 1);
 		} else {
 			mAnimPercentComplete += delta / mAnimSpeed;
 		}
@@ -98,27 +97,31 @@ public class GameDisplay extends JPanel {
 	}
 	
 	private void setColors() {
+        if (mBoard == null) {
+            return;
+        }
+
 		Random rng = new Random();
-		for (int i = 0; i < mBoard.length; i++) {
-			for (int j = 0; j < mBoard[i].length; j++) {
-				if (mBoard[i][j] == '.') 
+		for (int i = 0; i < mBoard.size(); i++) {
+			for (int j = 0; j < mBoard.size(); j++) {
+				if (mBoard.get(i, j) == '.') 
 					continue;
 					
-				if (mBoard[i][j] == 'X') {
-					mColorMap.put(mBoard[i][j], Color.RED);
-				} else if (!mColorMap.containsKey(mBoard[i][j])) {
+				if (mBoard.get(i, j) == 'X') {
+					mColorMap.put(mBoard.get(i, j), Color.RED);
+				} else if (!mColorMap.containsKey(mBoard.get(i, j))) {
 					Color c;
 					c = new Color(rng.nextInt(255),rng.nextInt(255),rng.nextInt(255));
-					mColorMap.put(mBoard[i][j], c);
+					mColorMap.put(mBoard.get(i, j), c);
 				} 
 			}
 		}
 	}
 
-	private Point getULCornerFor(char[][] board, char piece) {
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board[i].length; j++) {
-				if (board[j][i] == piece)
+	private Point getULCornerFor(Board board, char piece) {
+		for (int i = 0; i < board.size(); i++) {
+			for (int j = 0; j < board.size(); j++) {
+				if (board.get(i, j) == piece)
 					return new Point(i, j);
 			}
 		}
@@ -126,18 +129,22 @@ public class GameDisplay extends JPanel {
 		return null;
 	}
 	
-    public void setStage(int s) {
-		stage = s;
-		mBoard = mAnimation[stage];
+    public void setState(int s) {
+		state = s;
 		mAnimPercentComplete = 0.0;
+
+        if (mAnimation == null)
+            return;
+
+		mBoard = mAnimation.get(state);
 		
-		if (mAnimation.length > stage + 1) {
-			mBoardNext = mAnimation[stage + 1];
+		if (mAnimation.size() > state + 1) {
+			mBoardNext = mAnimation.get(state + 1);
 			
-			for (int i = 0; i < mBoard.length; i++) {
-				for (int j = 0; j < mBoard[i].length; j++) {
-					char p = mBoard[j][i];
-					if (p != '.' && p != mBoardNext[j][i]) {
+			for (int i = 0; i < mBoard.size(); i++) {
+				for (int j = 0; j < mBoard.size(); j++) {
+					char p = mBoard.get(i, j);
+					if (p != '.' && p != mBoardNext.get(i, j)) {
 						mAnimNewLoc = getULCornerFor(mBoardNext, p);
 						mAnimOldLoc = new Point(i, j);
 						mAnimPiece = p;
@@ -150,24 +157,25 @@ public class GameDisplay extends JPanel {
 		}	
     }
 
-    public int getStage() {
-        return stage;
+    public int getState() {
+        return state;
     }
 
 	private void drawPieces(Graphics g, int x, int y, int sqouter) {
 		int sqx, sqy = x + 5;
-		for (int i = 0; i < mBoard.length; i++) {
+        for (int j = 0; j < mBoard.size(); j++) {
 			sqx = x + 5;
-			for (int j = 0; j < mBoard[i].length; j++) {
-				if (mBoard[i][j] != '.') {
-					g.setColor(mColorMap.get(mBoard[i][j]));
+            for (int i = 0; i < mBoard.size(); i++) {
+                char piece = mBoard.get(i, j);
+				if (piece != '.') {
+					g.setColor(mColorMap.get(piece));
 					int px, py;
 					px = sqx - 5;
 					py = sqy - 5;
 					
-					if (mBoard[i][j] == mAnimPiece) {
-						int offsetX = j - mAnimOldLoc.x;
-						int offsetY = i - mAnimOldLoc.y;
+					if (piece == mAnimPiece) {
+						int offsetX = i - mAnimOldLoc.x;
+						int offsetY = j - mAnimOldLoc.y;
 						int nx = x + (mAnimNewLoc.x + offsetX) * sqouter;
 						int ny = y + (mAnimNewLoc.y + offsetY) * sqouter;
 
