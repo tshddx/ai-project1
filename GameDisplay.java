@@ -58,6 +58,8 @@ public class GameDisplay extends JPanel {
 	
     public void startAnimation() {
 		lastTime = new Date();
+        if (state == mAnimation.size() - 1)
+            resetAnimation();
 		animating = true;
     }
 	
@@ -83,7 +85,7 @@ public class GameDisplay extends JPanel {
 			
 		if (!animating)
 			return;
-				
+
 		Date now = new Date();
 		long delta = now.getTime() - lastTime.getTime();
 		
@@ -138,7 +140,7 @@ public class GameDisplay extends JPanel {
 
 		mBoard = mAnimation.get(state);
 		
-		if (mAnimation.size() > state + 1) {
+		if (state < mAnimation.size() - 1) {
 			mBoardNext = mAnimation.get(state + 1);
 			
 			for (int i = 0; i < mBoard.size(); i++) {
@@ -154,7 +156,7 @@ public class GameDisplay extends JPanel {
 			}
 		} else {
 			mBoardNext = null;
-		}	
+        }
     }
 
     public int getState() {

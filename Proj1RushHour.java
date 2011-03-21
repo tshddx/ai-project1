@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.event.*;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
@@ -44,6 +45,7 @@ public class Proj1RushHour {
                     stateSpinner.setValue(solutionDisplay.getState());
                 } else {
 					animTimer.stop();
+                    animateButton.setText("Play Animation");
                 }
 			}
 		}); 
@@ -58,6 +60,9 @@ public class Proj1RushHour {
         credits.add(new JLabel("Brian Hrebec"));
         credits.add(new JLabel("Thomas Shaddox"));
 		credits.add(new JLabel("Dave Robinson"));
+        credits.add(Box.createVerticalStrut(30));
+		credits.add(new JLabel("The protagonist"));
+		credits.add(new JLabel("vehicle is always red."));
         credits.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
         JPanel select = new JPanel();
@@ -75,10 +80,10 @@ public class Proj1RushHour {
                     solutionDisplay.setBoard(currentBoard);
                 }
 
-                movesInSolution.setText("");
-                maxTreeDepth.setText("");
-                statesGenerated.setText("");
-                animateButton.setEnabled(true);
+                movesInSolution.setText("  ");
+                maxTreeDepth.setText("  ");
+                statesGenerated.setText("  ");
+                animateButton.setEnabled(false);
                 solutionDisplay.setAnimation(null);
                 stateSlider.setValue(0);
                 stateSlider.setMaximum(0);
@@ -92,14 +97,25 @@ public class Proj1RushHour {
         select.add(Box.createVerticalStrut(10), BorderLayout.CENTER);
         select.add(new JButton(new AbstractAction("Solve!") {
             public void actionPerformed(ActionEvent e) {
+                if (currentBoard == null) {
+                    JOptionPane.showMessageDialog(mainpanel, "You mustn't solve the imaginary board!");
+                    return;
+                }
+
                 List<Board> solution = currentBoard.solve();
                 animateButton.setEnabled(true);
 				solutionDisplay.setAnimation(solution);
+
                 stateSlider.setMaximum(solution.size() - 1);
                 stateSpinner.setMaximum(solution.size() - 1);
+
                 movesInSolution.setText(Integer.toString(solution.size()));
                 maxTreeDepth.setText("??");
                 statesGenerated.setText("??");
+
+                solutionDisplay.startAnimation();
+                animTimer.start();
+                animateButton.setText("Pause Animation");
             }
         }), BorderLayout.SOUTH);
         select.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -112,21 +128,21 @@ public class Proj1RushHour {
         c.gridy = 0;
         info.add(new JLabel("Moves in Solution: "), c);
         c.gridx = 2;
-        movesInSolution = new JLabel("");
+        movesInSolution = new JLabel("  ");
         info.add(movesInSolution, c);
 
         c.gridx = 0;
         c.gridy = 1;
         info.add(new JLabel("Max Tree Depth: "), c);
         c.gridx = 2;
-        maxTreeDepth = new JLabel("");
+        maxTreeDepth = new JLabel("  ");
         info.add(maxTreeDepth, c);
 
         c.gridx = 0;
         c.gridy = 2;
         info.add(new JLabel("States Generated: "), c);
         c.gridx = 2;
-        statesGenerated = new JLabel("");
+        statesGenerated = new JLabel("  ");
         info.add(statesGenerated, c);
 
         c.gridx = 0;
@@ -135,14 +151,16 @@ public class Proj1RushHour {
         info.add(Box.createVerticalStrut(10), c);
 
         c.gridy = 4;
-        animateButton = new JButton(new AbstractAction("Toggle Animation") {
+        animateButton = new JButton(new AbstractAction("Play Animation") {
             public void actionPerformed(ActionEvent e) {
                 if (solutionDisplay.isAnimating()) {
                     solutionDisplay.pauseAnimation();
                     animTimer.stop();
+                    animateButton.setText("Play Animation");
                 } else {
                     solutionDisplay.startAnimation();
                     animTimer.start();
+                    animateButton.setText("Pause Animation");
                 }
             }
         });
@@ -163,6 +181,12 @@ public class Proj1RushHour {
         c.gridx = 1;
         c.weightx = .5; 
         mspmSpeed = new SpinnerNumberModel(2000, 100, 4000, 100);
+        mspmSpeed.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                solutionDisplay.setAnimationSpeed(
+                    mspmSpeed.getNumber().intValue());
+            }
+        });
         info.add(new JSpinner(mspmSpeed), c);
 
         c.gridx = 0;
@@ -173,16 +197,36 @@ public class Proj1RushHour {
         stateSlider.setMajorTickSpacing(5);
         stateSlider.setMinorTickSpacing(1);
         stateSlider.setSnapToTicks(true);
+        stateSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                int val = stateSlider.getValue();
+                if (solutionDisplay.getState() != val) {
+                    solutionDisplay.setState(val);
+                    stateSpinner.setValue(val);
+                    solutionDisplay.repaint();
+                }
+            }
+        });
         info.add(stateSlider, c);
 
         c.gridx = 0;
         c.gridy = 8;
         c.gridwidth = 1;
         c.weightx = 1;
-        info.add(new JLabel("Solution State: "), c);
+        info.add(new JLabel("Current Move: "), c);
         c.gridx = 1;
         c.weightx = .5; 
         stateSpinner = new SpinnerNumberModel(0, 0, 0, 1);
+        stateSpinner.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                int val = stateSpinner.getNumber().intValue();
+                if (solutionDisplay.getState() != val) {
+                    solutionDisplay.setState(val);
+                    stateSlider.setValue(val);
+                    solutionDisplay.repaint();
+                }
+            }
+        });
         info.add(new JSpinner(stateSpinner), c);
 
         info.setBorder(BorderFactory.createEmptyBorder(10,15,20,10));
@@ -205,7 +249,7 @@ public class Proj1RushHour {
 		
         Proj1RushHour proj = new Proj1RushHour();
 
-        JFrame frame = new JFrame();
+        JFrame frame = new JFrame("Rush Hour - CSC540 Project 1");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         frame.setMinimumSize(new Dimension(600, 400));
         frame.setContentPane(proj.mainpanel);
