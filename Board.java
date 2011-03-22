@@ -303,6 +303,9 @@ public class Board {
         }
     }
 	
+    /**
+     * Returns true if the piece is a 2x2 square piece, and false otherwise.
+     */
     private boolean isSquareStart(char piece, int k, int rowcol, boolean column) {
         if (rowcol == boardSize - 1)
             return false;
@@ -315,6 +318,10 @@ public class Board {
         }
     }
 
+	 /**
+     * Returns true if the piece is the last part of a 2x2 square piece, and
+	 * false otherwise.
+     */
     private boolean isSquareEnd(char piece, int k, int rowcol, boolean column) {
         if (rowcol == 0)
             return false;
@@ -327,6 +334,10 @@ public class Board {
         }
     }
 
+    /**
+     * Takes a Queue of Boards and the discription of a piece, and adds all
+	 * the possible moves of that piece to the Queue.
+     */
 	private void addGameState(Queue<Board> q, 
             HashSet<Board> invalid, char piece, 
             int offset, int length, int rowcol, boolean column,
