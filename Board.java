@@ -85,7 +85,6 @@ public class Board {
             currentBoard = ready.poll();
             System.out.println(currentBoard);
 
-            // TODO: pre-find row to check?
             if (currentBoard.solved())
                 break;
 
@@ -116,6 +115,8 @@ public class Board {
             solution.add(currentBoard);
             currentBoard = currentBoard.parent;
         }
+
+        solution.add(currentBoard);
 
         Collections.reverse(solution);
         System.out.println(solution.size());

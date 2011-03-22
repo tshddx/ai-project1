@@ -121,8 +121,13 @@ public class Proj1RushHour {
                 animateButton.setEnabled(true);
 				solutionDisplay.setAnimation(solution);
 
-                stateSlider.setMaximum(solution.size() - 1);
-                stateSpinner.setMaximum(solution.size() - 1);
+                if (solution.size() > 0) {
+                    stateSlider.setMaximum(solution.size() - 1);
+                    stateSpinner.setMaximum(solution.size() - 1);
+                } else {
+                    stateSlider.setMaximum(0);
+                    stateSpinner.setMaximum(0);
+                }
 
                 movesInSolution.setText(Integer.toString(solution.size()));
                 maxTreeDepth.setText("??");

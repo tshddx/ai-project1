@@ -129,7 +129,6 @@ public class GameDisplay extends JPanel {
      * @param s state number to make current.
      */
     public void setState(int s) {
-		state = s;
 
         // Reset the animation
 		mAnimPercentComplete = 0.0;
@@ -137,6 +136,7 @@ public class GameDisplay extends JPanel {
         if (mAnimation == null)
             return;
 
+		state = s;
         mAnimPiece = 0;
 
 		if (state < mAnimation.size() - 1 && state >= 0) {
@@ -147,17 +147,23 @@ public class GameDisplay extends JPanel {
 			for (int i = 0; i < mBoard.size(); i++) {
 				for (int j = 0; j < mBoard.size(); j++) {
 					char p = mBoard.get(i, j);
-					if (p != '.' && p != mBoardNext.get(i, j)) {
+					if (p != mBoardNext.get(i, j)) {
                         // This piece doesn't match, so it must be animated.
                         
+                        if (p == '.')
+                            p = mBoardNext.get(i, j);
+
                         // Find its new location.
 						mAnimNewLoc = getULCornerFor(mBoardNext, p);
-						mAnimOldLoc = new Point(i, j);
+						mAnimOldLoc = getULCornerFor(mBoard, p);
 						mAnimPiece = p;
 						return;
 					}
 				}
 			}
+		} else if (state == mAnimation.size() - 1 && state >= 0) {
+            mBoard = mAnimation.get(state);
+			mBoardNext = null;
 		} else {
 			mBoardNext = null;
         }
@@ -188,7 +194,7 @@ public class GameDisplay extends JPanel {
 		long delta = now.getTime() - lastTime.getTime();
 		
 		if (mAnimPercentComplete >= 1.0) {
-			setState(state + 1);
+            setState(state + 1);
 		} else {
 			mAnimPercentComplete += (double)delta / mAnimSpeed;
 		}
@@ -262,6 +268,11 @@ public class GameDisplay extends JPanel {
                         // the way toward its destination.
 						int offsetX = i - mAnimOldLoc.x;
 						int offsetY = j - mAnimOldLoc.y;
+                        System.out.println(i);
+                        System.out.println(j);
+                        System.out.println(mAnimOldLoc.x);
+                        System.out.println(mAnimOldLoc.y);
+                        System.out.println();
 						int nx = x + (mAnimNewLoc.x + offsetX) * sqouter;
 						int ny = y + (mAnimNewLoc.y + offsetY) * sqouter;
 
