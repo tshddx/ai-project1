@@ -13,8 +13,8 @@ public class Board {
 	private static char testBoard[][] =
 	    { { '.', '.', '.', '.', 'O', 'O', 'O'},
           { '.', '.', '.', '.', 'A', 'B', 'C'},
-          { '.', '.', 'X', 'X', 'A', 'B', 'C'},
-          { '.', '.', '.', '.', 'P', 'P', 'P'},
+          { 'G', '.', 'X', 'X', 'A', 'B', 'C'},
+          { 'G', '.', '.', '.', 'P', 'P', 'P'},
           { '.', '.', '.', '.', '.', '.', '.'},
           { '.', '.', '.', '.', '.', '.', '.'},
           { '.', '.', '.', '.', '.', '.', '.'} };
@@ -231,15 +231,32 @@ public class Board {
 		}
 		return p;
 	}	
-	
+
+
     /**
      * Return an array of all Board objects reachable from the current Board in a single move.
      */
 	public List<Board> validMoves() {
+		ArrayList<Board> m = validMoves(false);
+		m.addAll(validMoves(true));
+		return m;
+	}
+	 
+    /**
+     * Return an array of all Board objects reachable from the 
+     * current Board in a single move, for rows or columns only.
+     */
+	public ArrayList<Board> validMoves(boolean column) {
 	    // Iterate through rows
+		if (column) {
+			this.rotateLeft();
+			System.out.println(this);
+		}
 	    for (int i = 0; i < boardSize; i++) {
-            int emptyBefore = 0, emptyAfter = 0;
-	        int pieceLength = 0, pieceStart = 0;
+            int emptyBefore = 0;
+			int emptyAfter = 0;
+	        int pieceLength = 0;
+			int pieceStart = 0;
             char piece = ' ';
             // char lastChar = ' ';
             boolean hadPiece = false;
@@ -250,8 +267,9 @@ public class Board {
                         if (hadPiece) {
                             // Start after spacing
                             emptyAfter++;
-                            if (j == boardSize - 1) {
-                                addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i);
+                            if (j == boardSize - 1 && pieceLength > 1) {
+								System.out.println("Row " + i + ": movable piece '" + piece + "' with " + emptyBefore + " blanks before and " + emptyAfter + " blanks after.");
+                                addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i, column);
                             }
                         }
                         else {
@@ -278,18 +296,21 @@ public class Board {
                         hadPiece = true;
                         pieceLength++;
                         if (j == boardSize - 1) {
-                            addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i);
+							System.out.println("Row " + i + ": movable piece '" + piece + "' with " + emptyBefore + " blanks before and " + emptyAfter + " blanks after.");
+                            addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i, column);
                         }
                     }
                     else {
                         // found new piece
-                        if (hadPiece) {
+                        if (hadPiece && pieceLength > 1) {
                             // add moves for last piece (using empty after spaces)
-                            addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i);
+							System.out.println("Row " + i + ": movable piece '" + piece + "' with " + emptyBefore + " blanks before and " + emptyAfter + " blanks after.");
+                            addGameStates(piece, pieceStart, pieceLength, emptyBefore, emptyAfter, i, column);
                             emptyBefore = emptyAfter;
+							emptyAfter = 0;
                         }
                         else {
-                            // Never had a peice, found first piece, doesn't mean anything
+                            // Never had a piece, found first piece, doesn't mean anything
                         }
                         piece = board[i][j];
                         pieceLength = 1;
@@ -297,26 +318,91 @@ public class Board {
                     }
                 }
             }
-            if (hadPiece)
-                ;
+            // if (hadPiece)
         }
-
-		System.out.println("whatever");
-		return new ArrayList <Board>();
+		if (column) {
+			this.rotateRight();
+		}
+		return this.moves;
 	}
 	
-	private void addGameStates(char piece, int pieceStart, int pieceLength, int emptyBefore, int emptyAfter, int row) {
-        // add game states to array list
-        for (int i = 0; i < (emptyAfter + emptyBefore); i++) {
-            Board b = new Board(boardSize, board);
+	// returns a new copy of this game board as an array of character arrays
+	private char[][] getBoardCopy(){
+		char[][] boardCopy = new char[boardSize][boardSize];
+		for (int i = 0; i < boardSize; i++) {
+			for (int j = 0; j < boardSize; j++) {
+				boardCopy[i][j] = this.board[i][j];
+			}
+		}
+		return boardCopy;
+	}
+	
+	private void rotateLeft(){
+		Board b = new Board(boardSize, this.getBoardCopy());
+		
+		for (int i = 0; i < boardSize; i++) {
+			for (int j = 0; j < boardSize; j++) {
+				b.board[boardSize - j - 1][i] = this.board[i][j];
+			}
+		}
+		this.board = b.board;
+	}
+	
+	private void rotateRight(){
+		Board b = new Board(boardSize, this.getBoardCopy());
+		
+		for (int i = 0; i < boardSize; i++) {
+			for (int j = 0; j < boardSize; j++) {
+				b.board[i][j] = this.board[boardSize - j - 1][i];
+			}
+		}
+		this.board = b.board;
+	}
+	
+	private void addGameStates(char piece, int pieceStart, int pieceLength, int emptyBefore, int emptyAfter, int row, boolean rotate) {
+		// char[][] newRow = this.getRow(row);
+        Board newBoard = new Board(boardSize, this.getBoardCopy());
+		// remove the piece from the row
+		for (int i = 0; i < pieceLength; i++) {
+			newBoard.board[row][pieceStart + i] = '.';
+		}
+		// System.out.println(new String(newRow));
+		// generate the moves from moving the piece to the left
+        for (int i = 0; i < emptyBefore; i++) {
+			Board b = new Board(boardSize, newBoard.getBoardCopy());
+			// put the piece back in
+			for (int j = 0; j < pieceLength; j++) {
+				b.board[row][pieceStart - emptyBefore + i + j] = piece;
+			}
+			if (rotate) {
+				b.rotateRight();
+			}
+			moves.add(b);
+		}
+		// generate the moves from moving the piece to the right
+        for (int i = 0; i < emptyAfter; i++) {
+			Board b = new Board(boardSize, newBoard.getBoardCopy());
+			// put the piece back in
+			for (int j = 0; j < pieceLength; j++) {
+				b.board[row][pieceStart + 1 + i + j] = piece;
+			}
+			if (rotate) {
+				b.rotateRight();
+			}
+			moves.add(b);
         }
     }
 	
 	public static void main(String args[]) {
 		Board b = new Board(7, testBoard);
 		System.out.println(b);
-		System.out.println(b.getColumn(1));
-		System.out.println(b.getRow(6));
-		System.out.println(b.getPieces(b.getRow(6)));
+		List<Board> tonsOfMoves = b.validMoves();
+		System.out.println("\n\nSTARTING BOARD\n");
+		System.out.println(b);
+		System.out.println("\nPOSSIBLE X-AXIS MOVES\n");
+		for (Board m : tonsOfMoves) {
+			System.out.println();
+			System.out.println(m);
+		}
 	}
 }
