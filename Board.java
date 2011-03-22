@@ -118,6 +118,9 @@ public class Board {
         for(;;) {
             currentBoard = ready.poll();
             //System.out.println(currentBoard);
+            
+            if (currentBoard.depth > maxdepth)
+                maxdepth = currentBoard.depth;
 
             if (currentBoard.solved())
                 break;
@@ -125,15 +128,6 @@ public class Board {
             // TODO: push moves into queue directly?
             currentBoard.validMoves(ready, markedBoards);
 
-            if (currentBoard.depth > maxdepth)
-                maxdepth = currentBoard.depth;
-
-            if (markedBoards.size() > totalstates + 1000) {
-
-                totalstates = markedBoards.size();
-                prh.updateInfo(totalstates, maxdepth);
-            }
-            
         }
 
         //TODO: set tree depth
