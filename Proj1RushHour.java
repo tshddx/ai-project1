@@ -223,30 +223,9 @@ public class Proj1RushHour {
         });
         info.add(new JSpinner(mspmSpeed), c);
 
-        // State Slider
-        c.gridx = 0;
-        c.gridy = 7;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        stateSlider = new JSlider(JSlider.HORIZONTAL, 0, 0, 0);
-        stateSlider.setPaintTicks(true);
-        stateSlider.setMajorTickSpacing(5);
-        stateSlider.setMinorTickSpacing(1);
-        stateSlider.setSnapToTicks(true);
-        stateSlider.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                int val = stateSlider.getValue();
-                if (solutionDisplay.getState() != val) {
-                    solutionDisplay.setState(val);
-                    stateSpinner.setValue(val);
-                    solutionDisplay.repaint();
-                }
-            }
-        });
-        info.add(stateSlider, c);
-
         // State Spinner
         c.gridx = 0;
-        c.gridy = 8;
+        c.gridy = 7;
         c.gridwidth = 1;
         c.weightx = 1;
         info.add(new JLabel("Current Move: "), c);
@@ -264,6 +243,27 @@ public class Proj1RushHour {
             }
         });
         info.add(new JSpinner(stateSpinner), c);
+
+        // State Slider
+        c.gridx = 0;
+        c.gridy = 8;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        stateSlider = new JSlider(JSlider.HORIZONTAL, 0, 0, 0);
+        stateSlider.setPaintTicks(true);
+        stateSlider.setMajorTickSpacing(5);
+        stateSlider.setMinorTickSpacing(1);
+        stateSlider.setSnapToTicks(true);
+        stateSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                int val = stateSlider.getValue();
+                if (solutionDisplay.getState() != val) {
+                    solutionDisplay.setState(val);
+                    stateSpinner.setValue(val);
+                    solutionDisplay.repaint();
+                }
+            }
+        });
+        info.add(stateSlider, c);
 
         info.setBorder(BorderFactory.createEmptyBorder(10,15,20,10));
 
