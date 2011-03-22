@@ -14,9 +14,18 @@ public class Board {
           { '.', '.', '.', '.', 'A', 'B', 'C'},
           { 'G', '.', 'X', 'X', 'A', 'B', 'C'},
           { 'G', '.', '.', '.', 'P', 'P', 'P'},
-          { '.', '.', '.', '.', '.', '.', '.'},
-          { '.', '.', '.', '.', '.', '.', '.'},
+          { '.', 'K', 'K', '.', '.', '.', '.'},
+          { '.', 'K', 'K', '.', '.', '.', '.'},
           { '.', '.', '.', '.', '.', '.', '.'} };
+	private static char testBoard2[][] =
+	    { { '.', '.', '.', '.', '.', '.', '.'},
+          { '.', '.', '.', '.', '.', '.', '.'},
+          { '.', '.', '.', '.', '.', '.', '.'},
+          { '.', '.', '.', '.', '.', '.', '.'},
+          { '.', 'K', 'K', '.', '.', '.', '.'},
+          { '.', 'K', 'K', '.', '.', '.', '.'},
+          { '.', '.', '.', '.', '.', '.', '.'} };
+	
 	
 	public Board(int boardSize, char[][] board) {
 		this.boardSize = boardSize;
@@ -134,7 +143,6 @@ public class Board {
         totalstates = markedBoards.size();
         prh.updateInfo(totalstates, maxdepth);
         
-        System.out.println("#####################");
         // Trace back up through tree and generate the solution
         List<Board> solution = new ArrayList<Board>();
         while (currentBoard.parent != null) {
@@ -145,7 +153,7 @@ public class Board {
         solution.add(currentBoard);
 
         Collections.reverse(solution);
-        System.out.println(solution.size());
+        System.out.println("#####################");
         for (Board b : solution) {
             System.out.println(b);
         }
@@ -235,7 +243,9 @@ public class Board {
 
 
     /**
-     * Return an array of all Board objects reachable from the current Board in a single move.
+     * Adds to q Board objects reachable from the current Board in a single move.
+     * If the board is 'invalid', it will not be added. When a board is added
+     * to q, it will be added to invalid.
      */
 	public void validMoves(Queue<Board> q, HashSet<Board> invalid) {
 		validMoves(q, invalid, false);
@@ -243,8 +253,10 @@ public class Board {
 	}
 	 
     /**
-     * Return an array of all Board objects reachable from the 
-     * current Board in a single move, for rows or columns only.
+     * Adds all Board objects reachable from the 
+     * current Board in a single move to q, for rows or columns only.
+     * If the board is 'invalid', it will not be added. When a board is added
+     * to q, it will be added to invalid.
      */
 	public void validMoves(Queue<Board> q, 
             HashSet<Board> invalid, boolean column) {
@@ -291,22 +303,53 @@ public class Board {
         }
     }
 	
-	
-	private void addGameState(Queue<Board> q, 
-            HashSet<Board> invalid, Board baseboard, char piece, 
-            int offset, int length, int rowcol, boolean column) {
+    private boolean isSquareStart(char piece, int k, int rowcol, boolean column) {
+        if (rowcol == boardSize - 1)
+            return false;
 
-        Board b = new Board(baseboard, false);
+        if ((column && board[k][rowcol] == board[k][rowcol + 1]) || 
+            (!column && board[rowcol][k] == board[rowcol + 1][k])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isSquareEnd(char piece, int k, int rowcol, boolean column) {
+        if (rowcol == 0)
+            return false;
+
+        if ((column && board[k][rowcol] == board[k][rowcol - 1]) || 
+            (!column && board[rowcol][k] == board[rowcol - 1][k])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+	private void addGameState(Queue<Board> q, 
+            HashSet<Board> invalid, char piece, 
+            int offset, int length, int rowcol, boolean column,
+            boolean square) {
+
         for (int j = 0; j < length; j++) {
-            if (column)
-                b.board[offset + j][rowcol] = piece;
+            int w;
+            if (square)
+                w = 2;
             else
-                b.board[rowcol][offset + j] = piece;
+                w = 1;
+
+            for (int k = 0; k < w; k++) {
+                if (column)
+                    board[offset + j][rowcol + k] = piece;
+                else
+                    board[rowcol + k][offset + j] = piece;
+            }
         }
 
-        if (!invalid.contains(b)) {
-            q.offer(b);
-            invalid.add(b);
+        if (!invalid.contains(this)) {
+            q.offer(this);
+            invalid.add(this);
         }
     }
 
@@ -315,32 +358,88 @@ public class Board {
             int pieceStart, int pieceLength, int emptyBefore, 
             int emptyAfter, int rowcol, boolean column) {
 
-        //System.out.println("Row/Col " + rowcol + ": movable piece '" + piece + "' with " + emptyBefore + " blanks before and " + emptyAfter + " blanks after.");
+        // If this is the second half of a square, we've already processed it
+        if (isSquareEnd(piece, pieceStart, rowcol, column))
+            return;
+
+        /*
+        System.out.print("Row/Col " + rowcol + 
+                ": movable piece '" + piece + 
+                "' with " + emptyBefore + 
+                " blanks before and " + 
+                emptyAfter + " blanks after.");
+                */
+
+        boolean square = isSquareStart(piece, pieceStart, rowcol, column);
 
         Board baseboard = new Board(this, true);
 		// remove the piece from the row
 		for (int i = 0; i < pieceLength; i++) {
-            if (column)
-                baseboard.board[pieceStart + i][rowcol] = '.';
+            int w;
+            if (square)
+                w = 2;
             else
-                baseboard.board[rowcol][pieceStart + i] = '.';
+                w = 1;
+
+            for (int k = 0; k < w; k++) {
+                if (column)
+                    baseboard.board[pieceStart + i][rowcol + k] = '.';
+                else
+                    baseboard.board[rowcol + k][pieceStart + i] = '.';
+            }
 		}
 
-		// System.out.println(new String(newRow));
 		// generate the moves from moving the piece to the left(up)
         for (int i = 0; i < emptyBefore; i++) {
 			// put the piece back in
-            int offset = pieceStart - emptyBefore + i;
-            addGameState(q, invalid, baseboard, piece, offset, 
-                    pieceLength, rowcol, column);
+            int offset = pieceStart - i - 1;
+
+            // if the other side of the square is blocked,
+            // disallow this move and all future ones in this 
+            // direction
+            if (square) {
+                char blockPiece;
+                if (column)
+                    blockPiece = board[offset][rowcol + 1];
+                else
+                    blockPiece = board[rowcol + 1][offset];
+
+                if (blockPiece != '.' && blockPiece != piece)
+                    break;
+            }
+
+            // Create the new board
+            Board b = new Board(baseboard, false);
+            b.addGameState(q, invalid, piece, offset, 
+                    pieceLength, rowcol, column, square);
 		}
 
 		// generate the moves from moving the piece to the right(down)
         for (int i = 0; i < emptyAfter; i++) {
 			// put the piece back in
-            int offset = pieceStart + 1 + i;
-            addGameState(q, invalid, baseboard, piece, offset, 
-                    pieceLength, rowcol, column);
+            int offset = pieceStart + i + 1;
+
+            // if the other side of the square is blocked,
+            // disallow this move and all future ones in this 
+            // direction
+            if (square) {
+                if (offset + pieceLength > boardSize) // off the edge
+                    break;
+
+                char blockPiece;
+                if (column)
+                    blockPiece = board[offset + pieceLength - 1][rowcol + 1];
+                else
+                    blockPiece = board[rowcol + 1][offset + pieceLength - 1];
+
+                if (blockPiece != '.' && blockPiece != piece) // blocked
+                    break;
+            }
+
+            // Create the new board
+            Board b = new Board(baseboard, false);
+            b.addGameState(q, invalid, piece, offset, 
+                    pieceLength, rowcol, column, square);
         }
     }
 	
@@ -352,7 +451,7 @@ public class Board {
         b.validMoves(tonsOfMoves, invalid);
 		System.out.println("\n\nSTARTING BOARD\n");
 		System.out.println(b);
-		System.out.println("\nPOSSIBLE X-AXIS MOVES\n");
+		System.out.println("\nPOSSIBLE MOVES\n");
 		for (Board m : tonsOfMoves) {
 			System.out.println();
 			System.out.println(m);
