@@ -268,11 +268,6 @@ public class GameDisplay extends JPanel {
                         // the way toward its destination.
 						int offsetX = i - mAnimOldLoc.x;
 						int offsetY = j - mAnimOldLoc.y;
-                        System.out.println(i);
-                        System.out.println(j);
-                        System.out.println(mAnimOldLoc.x);
-                        System.out.println(mAnimOldLoc.y);
-                        System.out.println();
 						int nx = x + (mAnimNewLoc.x + offsetX) * sqouter;
 						int ny = y + (mAnimNewLoc.y + offsetY) * sqouter;
 

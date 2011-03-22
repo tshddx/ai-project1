@@ -39,6 +39,16 @@ public class Proj1RushHour {
     }
 
     /**
+     *
+     */
+    public void updateInfo(int totalstates, int maxdepth) {
+        maxTreeDepth.setText(Integer.toString(maxdepth));
+        statesGenerated.setText(Integer.toString(totalstates));
+        maxTreeDepth.repaint();
+        statesGenerated.repaint();
+    }
+
+    /**
      * Constructor for the main gui panel.
      */
     public Proj1RushHour() {
@@ -110,14 +120,16 @@ public class Proj1RushHour {
         select.add(Box.createVerticalStrut(10), BorderLayout.CENTER);
 
         // ActionListener for "Solve!" button
+        final Proj1RushHour prh = this;
         select.add(new JButton(new AbstractAction("Solve!") {
             public void actionPerformed(ActionEvent e) {
                 if (currentBoard == null) {
-                    JOptionPane.showMessageDialog(mainpanel, "You mustn't solve the imaginary board!");
+                    JOptionPane.showMessageDialog(mainpanel, 
+                        "The imaginary board MUST NOT BE SOLVED!");
                     return;
                 }
 
-                List<Board> solution = currentBoard.solve();
+                List<Board> solution = currentBoard.solve(prh);
                 animateButton.setEnabled(true);
 				solutionDisplay.setAnimation(solution);
 
@@ -130,8 +142,6 @@ public class Proj1RushHour {
                 }
 
                 movesInSolution.setText(Integer.toString(solution.size()));
-                maxTreeDepth.setText("??");
-                statesGenerated.setText("??");
 
                 solutionDisplay.startAnimation();
                 animTimer.start();
