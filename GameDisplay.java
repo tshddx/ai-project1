@@ -137,10 +137,10 @@ public class GameDisplay extends JPanel {
         if (mAnimation == null)
             return;
 
-		mBoard = mAnimation.get(state);
         mAnimPiece = 0;
 
 		if (state < mAnimation.size() - 1 && state >= 0) {
+            mBoard = mAnimation.get(state);
 			mBoardNext = mAnimation.get(state + 1);
 			
             // Compare the boards and look for a mismatch
