@@ -139,7 +139,7 @@ public class Board implements Comparable {
         return solve(prh, null);
     }
 
-    public List<Board> solve(Proj1RushHour prh, int[] maxstates) {
+    public List<Board> solve(Proj1RushHour prh, int[] max) {
         int maxdepth = 0;
         int totalstates = 0;
 
@@ -176,8 +176,10 @@ public class Board implements Comparable {
         totalstates = markedBoards.size();
         if (prh != null)
             prh.updateInfo(totalstates, maxdepth);
-        if (maxstates != null)
-            maxstates[0] = totalstates;
+        if (max != null) {
+            max[0] = totalstates;
+            max[1] = maxdepth;
+        }
         
         // Trace back up through tree and generate the solution
         List<Board> solution = new ArrayList<Board>();

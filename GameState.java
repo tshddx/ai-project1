@@ -26,9 +26,9 @@ public class GameState
     static public void main(String[] argv) {
         for (int i = 1; i <= initialGameStateCount(); i++) {
             Board b = getInitialGame(i);
-            int[] maxstates = new int[1];
-            int moves = b.solve(null, maxstates).size() - 1;
-            System.out.println(moves + " " + maxstates[0]);
+            int[] max = new int[2];
+            int moves = b.solve(null, max).size() - 1;
+            System.out.println(moves + " " + max[1] + " " + max[0]);
         }
     }
 	
