@@ -43,4 +43,4 @@ We chose to use a breadth-first search to discover our solution. This guarantees
 OUR RESULTS
 -----------
 
-We match or beat the number of moves for every solution provided. We beat the provided move number in cases in board 27 and 42 (using the numbers in our application).
+We match or beat the number of moves for every solution provided. We beat the provided move number in boards 27 and 42 (using the numbers in our application).
