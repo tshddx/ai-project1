@@ -136,6 +136,10 @@ public class Board implements Comparable {
      * in order
      */
     public List<Board> solve(Proj1RushHour prh) {
+        return solve(prh, null);
+    }
+
+    public List<Board> solve(Proj1RushHour prh, int[] maxstates) {
         int maxdepth = 0;
         int totalstates = 0;
 
@@ -170,7 +174,10 @@ public class Board implements Comparable {
 
         //TODO: set tree depth
         totalstates = markedBoards.size();
-        prh.updateInfo(totalstates, maxdepth);
+        if (prh != null)
+            prh.updateInfo(totalstates, maxdepth);
+        if (maxstates != null)
+            maxstates[0] = totalstates;
         
         // Trace back up through tree and generate the solution
         List<Board> solution = new ArrayList<Board>();
@@ -182,10 +189,11 @@ public class Board implements Comparable {
         solution.add(currentBoard);
 
         Collections.reverse(solution);
-        System.out.println("#####################");
-        for (Board b : solution) {
-            System.out.println(b);
-        }
+
+        //System.out.println("#####################");
+        //for (Board b : solution) {
+        //    System.out.println(b);
+        //}
         return solution;
     }
 

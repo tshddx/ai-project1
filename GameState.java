@@ -23,6 +23,14 @@ public class GameState
 
     } // end initializeGame
 
+    static public void main(String[] argv) {
+        for (int i = 1; i <= initialGameStateCount(); i++) {
+            Board b = getInitialGame(i);
+            int[] maxstates = new int[1];
+            int moves = b.solve(null, maxstates).size() - 1;
+            System.out.println(moves + " " + maxstates[0]);
+        }
+    }
 	
     /**
      * Return the number of RushHour games available.

@@ -141,7 +141,7 @@ public class Proj1RushHour {
                     stateSpinner.setMaximum(0);
                 }
 
-                movesInSolution.setText(Integer.toString(solution.size()));
+                movesInSolution.setText(Integer.toString(solution.size() - 1));
 
                 solutionDisplay.startAnimation();
                 animTimer.start();
