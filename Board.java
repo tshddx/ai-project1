@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Board {
+public class Board implements Comparable {
 	private int boardSize;
 	private char board[][];
     private Board parent;
@@ -8,7 +8,7 @@ public class Board {
     private int depth;
 
 
-	// For now
+	// For testing only
 	private static char testBoard[][] =
 	    { { '.', '.', '.', '.', 'O', 'O', 'O'},
           { '.', '.', '.', '.', 'A', 'B', 'C'},
@@ -105,6 +105,32 @@ public class Board {
             return false;
     }
 
+    public int getScore() {
+        boolean foundX = false;
+        int count = 0;
+        char last = '.';
+        for (int i = 0; i < boardSize; i++) {
+            if (!foundX && board[protagRow][i] == 'X') {
+                foundX = true;
+                continue;
+            } else if (foundX) {
+                char piece = board[protagRow][i];
+                if (piece != last && piece != 'X' && piece != '.')
+                    count++;
+                last = piece;
+            }
+        }
+        return count + depth;
+    }
+
+    public int compareTo(Object o) {
+        if (!(o instanceof Board))
+            return -1;
+
+        Board other = (Board)o;
+        return getScore() - other.getScore();
+    }
+
     /**
      * Solves this board, and returns a list of the solution boards
      * in order
@@ -117,8 +143,11 @@ public class Board {
         if (isBoardBlank())
             return new ArrayList<Board>();
         
-        // Run BFS
-        Queue<Board> ready = new LinkedList<Board>();
+        // For BFS
+        // Queue<Board> ready = new LinkedList<Board>();
+        
+        // For A*
+        Queue<Board> ready = new PriorityQueue<Board>();
         HashSet<Board> markedBoards = new HashSet<Board>();
         ready.offer(this);
         markedBoards.add(this);
@@ -462,6 +491,7 @@ public class Board {
         b.validMoves(tonsOfMoves, invalid);
 		System.out.println("\n\nSTARTING BOARD\n");
 		System.out.println(b);
+		System.out.println("Score: " + b.getScore());
 		System.out.println("\nPOSSIBLE MOVES\n");
 		for (Board m : tonsOfMoves) {
 			System.out.println();
