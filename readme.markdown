@@ -41,6 +41,6 @@ Note: Technically, every time you can move a piece, you can immediately move the
 We chose to use a breadth-first search to discover our solution. This guarantees that we find an optimal solution, which means we will solve each puzzle in the fewest moves possible. In some cases, there are multiple "optimal solutions." For example, there might be two different ways to solve a puzzle in eight moves. In these cases, our application will find one of these based on the order in which neighbors are visited.
 
 OUR RESULTS
-===========
+-----------
 
 We match or beat the number of moves for every solution provided. We beat the provided move number in cases in board 27 and 42 (using the numbers in our application).
