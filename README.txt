@@ -1,13 +1,15 @@
-CSC 540
-Project 1 "Rush Hour"
+CSC 540 Project 1
+=================
+***"Rush Hour"***
 
 Authors:
-Brian Hrebec
-David Robinson
-Thomas Shaddox
+
+- Brian Hrebec
+- David Robinson
+- Thomas Shaddox
 
 INSTRUCTIONS
-============
+------------
 
 From the directory containing our .java files, run the command
 
@@ -30,7 +32,7 @@ When it find a solution, the pieces will begin moving. You can change the millis
 Notice that once a solution has been found, information will be displayed such as the number of moves in the solution, the max tree depth, and the number of states that were generated when searching for a solution.
 
 HOW IT WORKS
-============
+------------
 
 We created a Board class that represents a state of the game board. Starting from the initial Board (which you can choose), we generate every valid move that can be made. Each of these is a new Board object, and they represent the "neighbors" of the initial Board. Starting from this initial Board, and subsequently generating neighbors, we create the graph of the problem space one Board at a time.
 
