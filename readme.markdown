@@ -19,7 +19,7 @@ Then run the command
 
     java Proj1RushHour
 
-A few of the puzzles (15, 27, 36, and 38 using the numbers in our application) require more than the default 300 megabytes of Java head space. To fix this, you can run the above command with an additional option:
+A few of the puzzles (15, 27, 36, and 38 using the numbers in our application) require more than the default 300 megabytes of Java heap space. To fix this, you can run the above command with an additional option:
 
     java -Xmx1500m Proj1RushHour
 
@@ -38,7 +38,7 @@ We created a Board class that represents a state of the game board. Starting fro
 
 Note: Technically, every time you can move a piece, you can immediately move the piece back to its previous position. Clearly, this results in no progress being made. To make sure we don't return to a previously-visited game state, we hash each new Board in a Java HashSet. HashSets provide constant time `add` and `contains` operations, so they're quite fast.
 
-We chose to use a breadth-first search to discover our solution. This guarantees that we find an optimal solution, which means we will solve each puzzle in the fewest moves possible. In some cases, there are multiple "optimal solutions." For example, there might be two different ways to solve a puzzle in eight moves. In these cases, our application will find one of these based on the order in which neighbors are visited.
+We chose to use a A\* search to discover our solution. The estimate is made based on the number of pieces blocking the X. This guarantees that we find an optimal solution, which means we will solve each puzzle in the fewest moves possible. In some cases, there are multiple "optimal solutions." For example, there might be two different ways to solve a puzzle in eight moves. In these cases, our application will find one of these based on the order in which neighbors are visited.
 
 OUR RESULTS
 -----------
