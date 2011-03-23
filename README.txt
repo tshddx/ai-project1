@@ -17,7 +17,13 @@ Then run the command
 
     java Proj1RushHour
 
-Our application should appear, with an empty game board that says "There is no board!" Click on the "Select a board..." drop-down box and choose one of the 42 puzzles to solve. When you find one you like, click the "Solve!" button. Depending on the puzzle, the application might discover a solution immediately, or it might have to "think" for a while.
+A few of the puzzles (15, 27, 36, and 38 using the numbers in our application) require more than the default 300 megabytes of Java head space. To fix this, you can run the above command with an additional option:
+
+    java -Xmx1500m Proj1RushHour
+
+These "difficult" puzzles still don't take more than a minute to solve on the Cheek lab computers.
+
+When you run the above command, our application should appear, with an empty game board that says "There is no board!" Click on the "Select a board..." drop-down box and choose one of the 42 puzzles to solve. When you find one you like, click the "Solve!" button. Depending on the puzzle, the application might discover a solution immediately, or it might have to "think" for a while.
 
 When it find a solution, the pieces will begin moving. You can change the milliseconds/move option (descreasing the value will increase the animation speed). You can also pause and resume the animation, or jump to a specific move.
 
@@ -35,4 +41,4 @@ We chose to use a breadth-first search to discover our solution. This guarantees
 OUR RESULTS
 ===========
 
-We match or beat the number of moves for every solution provided. We beat the provided move number in cases in board 27 and 42 (as numbered in our application).
+We match or beat the number of moves for every solution provided. We beat the provided move number in cases in board 27 and 42 (using the numbers in our application).

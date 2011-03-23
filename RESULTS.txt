@@ -1,7 +1,12 @@
-An asterisk at the end indicates a puzzle that takes at least a minute to solve on the school lab computers.
+An asterisk at the end indicates a puzzle that takes at least 30 seconds to solve on the school lab computers.
 
 format:
 number_of_moves max_tree_depth states_investigated
+
+
+
+
+
 
 0 0 0
 6 5 9330
@@ -13,12 +18,11 @@ number_of_moves max_tree_depth states_investigated
 8 7 686
 20 19 1130
 13 12 5500
-13 12 500
 14 13 6911
 11 10 10640
 16 15 1706
 13 12 3702
-* ran for 10 minutes and never found a solution
+21 20 1009867 *
 20 19 33598
 17 16 11679
 22 21 101786
@@ -39,9 +43,9 @@ number_of_moves max_tree_depth states_investigated
 32 31 40549
 27 26 6021
 35 34 9280
-* never found a solution
+33 32 1549360 *
 37 36 281141
-* never found a solution
+41 40 2221301 *
 40 39 201992
 49 48 36649
 58 57 192440
